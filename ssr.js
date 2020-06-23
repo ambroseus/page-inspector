@@ -36,8 +36,17 @@ const skippedResources = [
   'tiqcdn',
 ]
 
-function inject(text) {
-  return text
+function nodePath(el) {
+  const path = []
+  do {
+    path.unshift(
+      el.nodeName + (el.className ? ' class="' + el.className + '"' : '')
+    )
+  } while (el.nodeName.toLowerCase() != 'html' && (el = el.parentNode))
+
+  console.log(path)
+
+  return path
 }
 
 /**
@@ -70,7 +79,7 @@ async function ssr(url, browserWSEndpoint) {
       waitUntil: 'networkidle0',
     })
 
-    await page.exposeFunction('inject', text => inject(text))
+    await page.exposeFunction('nodePath', node => nodePath(node))
 
     // Inject <base> on page to relative resources load properly.
     await page.evaluate(async url => {
@@ -80,7 +89,9 @@ async function ssr(url, browserWSEndpoint) {
       document.head.prepend(base)
 
       const div = document.createElement('div')
-      div.innerText = await window.inject('INJECTED CONTENT')
+      div.innerHTML = `
+				<button onClick="var sel=window.getSelection(); if(!sel) return false; var el=sel.focusNode;var path=[];while(el.nodeName.toLowerCase()!='html'){path.unshift(el.nodeName+(el.className ? ' class='+el.className : ''));el=el.parentNode; }path.push(sel.toString());console.log(path);">save selection</button>
+			`
       document.body.prepend(div)
     }, url)
 
