@@ -17,6 +17,7 @@
     "dev": "pm2 --name page-inspector start server.js"
   },
   "dependencies": {
+    "express": "4.17.1",
     "puppeteer": "4.0.0"
   }
 }

@@ -1,14 +1,36 @@
-const http = require('http');
+const express = require('express');
+const puppeteer = require('puppeteer');
+const ssr = require('./ssr.js');
 
 const hostname = '127.0.0.1';
-const port = 8000;
+const port = 8081;
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World');
+
+const app = express();
+
+const port = params.port || 3000;
+app.listen(port, () => console.log(`page-inspector listen on http://localhost:${port}`))
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+	next();
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+let browserWSEndpoint = null;
+
+app.get('/', async (req, res, next) => {
+
+	const url = req.query;
+
+	if (!url) {
+		return res.status(400).send(`Invalid url param: Example: http://localhost:${port}/google.com`);
+	}
+
+	if (!browserWSEndpoint) {
+		const browser = await puppeteer.launch();
+		browserWSEndpoint = await browser.wsEndpoint();
+	}
+
+	const { html, status } = await ssr(url, browserWSEndpoint);
+	return res.status(status).send(html);
+})
