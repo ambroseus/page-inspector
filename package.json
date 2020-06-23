@@ -14,7 +14,7 @@
   "homepage": "https://github.com/ambroseus/page-inspector#readme",
   "main": "server.js",
   "scripts": {
-    "dev": "pm2 --name page-inspector start server.js"
+    "dev": "pm2 --name page-inspector start server.js --watch"
   },
   "dependencies": {
     "express": "4.17.1",

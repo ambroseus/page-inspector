@@ -64,8 +64,7 @@ async function ssr(url, browserWSEndpoint) {
 		})
 
 		const response = await page.goto(url, {
-			timeout: 25000,
-			waitUntil: 'networkidle2'
+			waitUntil: 'networkidle0'
 		});
 
 		// Inject <base> on page to relative resources load properly.
@@ -97,4 +96,4 @@ async function ssr(url, browserWSEndpoint) {
 
 };
 
-exports = ssr;
+exports.ssr = ssr;
