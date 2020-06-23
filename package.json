@@ -2,10 +2,6 @@
   "name": "page-inspector",
   "version": "1.0.0",
   "description": "page inspector PoC",
-  "main": "server.js",
-  "scripts": {
-    "dev": "pm2 --name page-inspector start server.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ambroseus/page-inspector.git"
@@ -15,5 +11,12 @@
   "bugs": {
     "url": "https://github.com/ambroseus/page-inspector/issues"
   },
-  "homepage": "https://github.com/ambroseus/page-inspector#readme"
+  "homepage": "https://github.com/ambroseus/page-inspector#readme",
+  "main": "server.js",
+  "scripts": {
+    "dev": "pm2 --name page-inspector start server.js"
+  },
+  "dependencies": {
+    "puppeteer": "4.0.0"
+  }
 }
