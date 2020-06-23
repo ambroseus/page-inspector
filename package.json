@@ -1,0 +1,19 @@
+{
+  "name": "page-inspector",
+  "version": "1.0.0",
+  "description": "page inspector PoC",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ambroseus/page-inspector.git"
+  },
+  "author": "Eugene Samonenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ambroseus/page-inspector/issues"
+  },
+  "homepage": "https://github.com/ambroseus/page-inspector#readme"
+}
