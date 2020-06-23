@@ -17,7 +17,13 @@
     "dev": "pm2 --name page-inspector start server.js --watch"
   },
   "dependencies": {
+    "eslint": "7.3.1",
     "express": "4.17.1",
     "puppeteer": "4.0.0"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
   }
 }
