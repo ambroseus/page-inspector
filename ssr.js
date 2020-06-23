@@ -36,6 +36,11 @@ const skippedResources = [
 	'tiqcdn',
 ];
 
+function inject(text) {
+	return text;
+}
+
+
 /**
  * https://developers.google.com/web/tools/puppeteer/articles/ssr#reuseinstance
  * @param {string} url URL to prerender.
@@ -67,12 +72,18 @@ async function ssr(url, browserWSEndpoint) {
 			waitUntil: 'networkidle0'
 		});
 
+		await page.exposeFunction('inject', text => inject(text));
+
 		// Inject <base> on page to relative resources load properly.
-		await page.evaluate(url => {
+		await page.evaluate(async (url) => {
 			const base = document.createElement('base');
 			base.href = url;
 			// Add to top of head, before all other resources.
 			document.head.prepend(base);
+
+			const div = document.createElement('div');
+      div.innerText = await window.inject('!!!!!');
+			document.body.prepend(div);
 		}, url);
 
 		// Remove scripts and html imports. They've already executed.
