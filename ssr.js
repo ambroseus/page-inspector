@@ -36,17 +36,8 @@ const skippedResources = [
   'tiqcdn',
 ]
 
-function nodePath(el) {
-  const path = []
-  do {
-    path.unshift(
-      el.nodeName + (el.className ? ' class="' + el.className + '"' : '')
-    )
-  } while (el.nodeName.toLowerCase() != 'html' && (el = el.parentNode))
-
-  console.log(path)
-
-  return path
+function ssrlog(str) {
+  console.log(str)
 }
 
 /**
@@ -79,7 +70,7 @@ async function ssr(url, browserWSEndpoint) {
       waitUntil: 'networkidle0',
     })
 
-    await page.exposeFunction('nodePath', node => nodePath(node))
+    await page.exposeFunction('ssrlog', str => console.log(str))
 
     // Inject <base> on page to relative resources load properly.
     await page.evaluate(async url => {
@@ -88,10 +79,28 @@ async function ssr(url, browserWSEndpoint) {
       // Add to top of head, before all other resources.
       document.head.prepend(base)
 
+      function getSelection() {
+        var sel = window.getSelection()
+        if (!sel) return false
+        var el = sel.focusNode
+        var path = []
+        while (el.nodeName.toLowerCase() != 'html') {
+          path.unshift(
+            el.nodeName + (el.className ? ' class=' + el.className : '')
+          )
+          el = el.parentNode
+        }
+        path.push(sel.toString())
+        console.log(path)
+      }
+
+      const getSelectionStr = getSelection.toString()
+
       const div = document.createElement('div')
       div.innerHTML = `
-				<button onClick="var sel=window.getSelection(); if(!sel) return false; var el=sel.focusNode;var path=[];while(el.nodeName.toLowerCase()!='html'){path.unshift(el.nodeName+(el.className ? ' class='+el.className : ''));el=el.parentNode; }path.push(sel.toString());console.log(path);">save selection</button>
-			`
+				<button onClick="(${getSelectionStr})()">save selection</button>
+      `
+      await window.ssrlog(div.innerHTML)
       document.body.prepend(div)
     }, url)
 
