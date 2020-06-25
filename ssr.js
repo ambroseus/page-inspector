@@ -137,9 +137,9 @@ async function ssr(url, browserWSEndpoint) {
             button.style.background = 'white'
 
             const target = currentEl.innerHTML.toString()
-            const parent = currentEl.parentNode.innerHTML.toString()
+            const element = currentEl.outerHTML.toString()
             const xpath = getXPath(currentEl)
-            alert(`target: ${target}\n\nparent: ${parent}\n\nxpath: ${xpath}`)
+            alert(`target: ${target}\n\nelement: ${element}\n\nxpath: ${xpath}`)
 
             currentEl = undefined
             return false
