@@ -87,28 +87,47 @@ async function ssr(url, browserWSEndpoint) {
         if (!highlightEnabled) return
         const el = document.elementFromPoint(e.clientX, e.clientY)
 
-        if (currentEl !== el) {
+        if (el && currentEl !== el) {
           if (currentEl && currentElStyle) {
             currentEl.style = currentElStyle
+            currentEl.onclick = currentElOnClick
           }
 
           currentEl = el
           currentElStyle = { ...el.style }
+          currentElOnClick = el.onclick
 
           if (el.id === 'enable-highlight') return
 
           currentEl.style.background = '#ffa'
           currentEl.style.color = 'brown'
-          console.clear()
-          console.log(currentEl)
+          currentEl.onclick = e => {
+            e.stopPropagation()
+            e.preventDefault()
+
+            currentEl.style = currentElStyle
+            currentEl.onclick = currentElOnClick
+            currentElStyle = undefined
+            currentElOnClick = undefined
+            highlightEnabled = undefined
+
+            const button = document.getElementById('enable-highlight')
+            button.style.background = 'white'
+
+            alert(currentEl.parentElement.innerHTML.toString())
+
+            currentEl = undefined
+            return false
+          }
         }
       }
 
       const script = document.createElement('script')
       script.innerHTML = `
-        var currentEl = null
-        var currentElStyle = null
-        var highlightEnabled = false
+        var currentEl
+        var currentElStyle
+        var currentElOnClick
+        var highlightEnabled
         document.onmousemove = ${onMouseMove.toString()}
         `
       document.head.append(script)
