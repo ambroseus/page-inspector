@@ -68,12 +68,59 @@ async function ssr(url, browserWSEndpoint) {
 
     await page.exposeFunction('ssrlog', str => console.log(str))
 
-    // inject <base> on page to relative resources load properly
+    // remove scripts and html imports - they've already executed
+    await page.evaluate(() => {
+      const elements = document.querySelectorAll('script, link[rel="import"]')
+      elements.forEach(e => e.remove())
+    })
+
+    // inject <base> and <style> on page to relative resources load properly
     await page.evaluate(async url => {
       const base = document.createElement('base')
       base.href = url
       document.head.prepend(base)
+      const style = document.createElement('style')
+      /*
+          border: 1px solid yellow;
+          box-sizing: border-box;
+      */
+      style.innerHTML = `
+        .__highlight-element__ {
+          background: ;
+        }
+      `
+      document.head.append(style)
     }, url)
+
+    // inject global <script> for event listeners
+    await page.evaluate(async () => {
+      function onMouseMove(e) {
+        const x = e.clientX
+        const y = e.clientY
+        const el = document.elementFromPoint(x, y)
+
+        if (currentEl !== el) {
+          if (currentEl && currentElStyle) {
+            currentEl.style = currentElStyle
+          }
+          currentEl = el
+          currentElStyle = { ...el.style }
+
+          currentEl.style.background = '#ffa'
+          currentEl.style.color = 'brown'
+          console.clear()
+          console.log(currentEl)
+        }
+      }
+
+      const script = document.createElement('script')
+      script.innerHTML = `
+        var currentEl = null
+        var currentElStyle = null
+        document.onmousemove = ${onMouseMove.toString()}
+        `
+      document.head.append(script)
+    })
 
     // inject save selection button and handler
     await page.evaluate(async url => {
@@ -129,12 +176,6 @@ async function ssr(url, browserWSEndpoint) {
       await window.ssrlog(`url: ${url}`)
       document.body.prepend(div)
     }, url)
-
-    // remove scripts and html imports - they've already executed
-    await page.evaluate(() => {
-      const elements = document.querySelectorAll('script, link[rel="import"]')
-      elements.forEach(e => e.remove())
-    })
 
     const html = await page.content()
     await page.close()
