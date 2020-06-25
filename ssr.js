@@ -119,7 +119,7 @@ async function ssr(url, browserWSEndpoint) {
           currentElStyle = { ...el.style }
           currentElOnClick = el.onclick
 
-          if (el.id === 'enable-highlight') return
+          if (el.id.startsWith('enable-highlight')) return
 
           currentEl.style.background = '#ffa'
           currentEl.style.color = 'brown'
@@ -133,7 +133,7 @@ async function ssr(url, browserWSEndpoint) {
             currentElOnClick = undefined
             highlightEnabled = undefined
 
-            const button = document.getElementById('enable-highlight')
+            const button = document.getElementById('enable-highlight-button')
             button.style.background = 'white'
 
             const target = currentEl.innerHTML.toString()
@@ -173,12 +173,14 @@ async function ssr(url, browserWSEndpoint) {
     await page.evaluate(async url => {
       function triggerHighlight(e) {
         highlightEnabled = !highlightEnabled
-        const el = document.getElementById('enable-highlight')
+        const el = document.getElementById('enable-highlight-button')
         el.style.background = highlightEnabled ? 'gray' : 'white'
       }
       const div = document.createElement('div')
+      div.id = 'enable-highlight'
+      div.style = `position: absolute;top:0;left:0;z-index:99999`
       div.innerHTML = `
-        <button id='enable-highlight' onClick="(${triggerHighlight.toString()})()">select SKU</button>
+        <button id='enable-highlight-button' onClick="(${triggerHighlight.toString()})()">select SKU</button>
       `
       document.body.prepend(div)
 
