@@ -146,7 +146,13 @@ async function ssr(url, browserWSEndpoint) {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ url: inspectUrl, target, element, xpath }),
+              body: JSON.stringify({
+                field: 'partSku',
+                url: inspectUrl,
+                target,
+                element,
+                xpath,
+              }),
             })
 
             alert(`target: ${target}\n\nelement: ${element}\n\nxpath: ${xpath}`)
