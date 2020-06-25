@@ -86,22 +86,21 @@ async function ssr(url, browserWSEndpoint) {
       function onMouseMove(e) {
         if (!highlightEnabled) return
 
+        const elTag = el => el.tagName.toLowerCase()
+
         function getXPath(element) {
-          if (element === document.body) return element.tagName.toLowerCase()
+          if (element === document.body) return elTag(element)
           let ix = 0
           let siblings = element.parentNode.childNodes
 
           for (let i = 0; i < siblings.length; i++) {
             let sibling = siblings[i]
-            if (sibling === element)
-              return (
-                getXPath(element.parentNode) +
-                '/' +
-                element.tagName.toLowerCase() +
-                '[' +
-                (ix + 1) +
-                ']'
-              )
+            if (sibling === element) {
+              const parent = getXPath(element.parentNode)
+              const tag = elTag(element)
+              const index = ix + 1
+              return `${parent}/${tag}[${index}]`
+            }
             if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
               ix++
             }
@@ -138,7 +137,7 @@ async function ssr(url, browserWSEndpoint) {
             button.style.background = 'white'
 
             const target = currentEl.innerHTML.toString()
-            const parent = currentEl.parentElement.innerHTML.toString()
+            const parent = currentEl.parentNode.innerHTML.toString()
             const xpath = getXPath(currentEl)
             alert(`target: ${target}\n\nparent: ${parent}\n\nxpath: ${xpath}`)
 
@@ -170,9 +169,9 @@ async function ssr(url, browserWSEndpoint) {
       div.innerHTML = `
         <button id='enable-highlight' onClick="(${triggerHighlight.toString()})()">select SKU</button>
       `
-      await window.ssrlog(div.innerHTML)
-      await window.ssrlog(`url: ${url}`)
       document.body.prepend(div)
+
+      await window.ssrlog(`url: ${url}`)
     }, url)
 
     const html = await page.content()
