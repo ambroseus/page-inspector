@@ -85,6 +85,29 @@ async function ssr(url, browserWSEndpoint) {
     await page.evaluate(async () => {
       function onMouseMove(e) {
         if (!highlightEnabled) return
+
+        function getXPath(element) {
+          if (element === document.body) return element.tagName.toLowerCase()
+          let ix = 0
+          let siblings = element.parentNode.childNodes
+
+          for (let i = 0; i < siblings.length; i++) {
+            let sibling = siblings[i]
+            if (sibling === element)
+              return (
+                getXPath(element.parentNode) +
+                '/' +
+                element.tagName.toLowerCase() +
+                '[' +
+                (ix + 1) +
+                ']'
+              )
+            if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+              ix++
+            }
+          }
+        }
+
         const el = document.elementFromPoint(e.clientX, e.clientY)
 
         if (el && currentEl !== el) {
@@ -114,7 +137,10 @@ async function ssr(url, browserWSEndpoint) {
             const button = document.getElementById('enable-highlight')
             button.style.background = 'white'
 
-            alert(currentEl.parentElement.innerHTML.toString())
+            const target = currentEl.innerHTML.toString()
+            const parent = currentEl.parentElement.innerHTML.toString()
+            const xpath = getXPath(currentEl)
+            alert(`target: ${target}\n\nparent: ${parent}\n\nxpath: ${xpath}`)
 
             currentEl = undefined
             return false
