@@ -91,10 +91,11 @@ async function ssr(url, browserWSEndpoint) {
           if (currentEl && currentElStyle) {
             currentEl.style = currentElStyle
           }
-          if (el.id === 'enable-highlight') return
 
           currentEl = el
           currentElStyle = { ...el.style }
+
+          if (el.id === 'enable-highlight') return
 
           currentEl.style.background = '#ffa'
           currentEl.style.color = 'brown'
@@ -119,7 +120,6 @@ async function ssr(url, browserWSEndpoint) {
         highlightEnabled = !highlightEnabled
         const el = document.getElementById('enable-highlight')
         el.style.background = highlightEnabled ? 'gray' : 'white'
-        console.log(el)
       }
       const div = document.createElement('div')
       div.innerHTML = `
