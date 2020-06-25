@@ -74,35 +74,25 @@ async function ssr(url, browserWSEndpoint) {
       elements.forEach(e => e.remove())
     })
 
-    // inject <base> and <style> on page to relative resources load properly
+    // inject <base> on page to relative resources load properly
     await page.evaluate(async url => {
       const base = document.createElement('base')
       base.href = url
       document.head.prepend(base)
-      const style = document.createElement('style')
-      /*
-          border: 1px solid yellow;
-          box-sizing: border-box;
-      */
-      style.innerHTML = `
-        .__highlight-element__ {
-          background: ;
-        }
-      `
-      document.head.append(style)
     }, url)
 
     // inject global <script> for event listeners
     await page.evaluate(async () => {
       function onMouseMove(e) {
-        const x = e.clientX
-        const y = e.clientY
-        const el = document.elementFromPoint(x, y)
+        if (!highlightEnabled) return
+        const el = document.elementFromPoint(e.clientX, e.clientY)
 
         if (currentEl !== el) {
           if (currentEl && currentElStyle) {
             currentEl.style = currentElStyle
           }
+          if (el.id === 'enable-highlight') return
+
           currentEl = el
           currentElStyle = { ...el.style }
 
@@ -117,60 +107,23 @@ async function ssr(url, browserWSEndpoint) {
       script.innerHTML = `
         var currentEl = null
         var currentElStyle = null
+        var highlightEnabled = false
         document.onmousemove = ${onMouseMove.toString()}
         `
       document.head.append(script)
     })
 
-    // inject save selection button and handler
+    // inject  button and handler
     await page.evaluate(async url => {
-      function getSelection() {
-        let sel = window.getSelection()
-        if (!sel) return false
-
-        function getXPath(element) {
-          if (element.id) return `//*[@id='` + element.id + `']`
-          if (element === document.body) return element.tagName.toLowerCase()
-          let ix = 0
-          let siblings = element.parentNode.childNodes
-
-          for (let i = 0; i < siblings.length; i++) {
-            let sibling = siblings[i]
-            if (sibling === element)
-              return (
-                getXPath(element.parentNode) +
-                '/' +
-                element.tagName.toLowerCase() +
-                '[' +
-                (ix + 1) +
-                ']'
-              )
-            if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
-              ix++
-            }
-          }
-        }
-
-        function getPath(el) {
-          let path = []
-          while (el.nodeName.toLowerCase() != 'html') {
-            path.unshift(
-              el.nodeName + (el.className ? ` class='${el.className}'` : '')
-            )
-            el = el.parentNode
-          }
-          return path
-        }
-
-        //console.log(sel)
-
-        console.log(getXPath(sel.focusNode.parentElement))
-        console.log(sel.toString())
+      function triggerHighlight(e) {
+        highlightEnabled = !highlightEnabled
+        const el = document.getElementById('enable-highlight')
+        el.style.background = highlightEnabled ? 'gray' : 'white'
+        console.log(el)
       }
-
       const div = document.createElement('div')
       div.innerHTML = `
-				<button onClick="(${getSelection.toString()})()">save selection</button>
+        <button id='enable-highlight' onClick="(${triggerHighlight.toString()})()">select SKU</button>
       `
       await window.ssrlog(div.innerHTML)
       await window.ssrlog(`url: ${url}`)
