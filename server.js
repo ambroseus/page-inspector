@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const puppeteer = require('puppeteer')
+const chromium = require('chrome-aws-lambda')
 const { ssr } = require('./ssr.js')
 
 const hostname = '127.0.0.1'
@@ -30,7 +30,7 @@ app.get('/', async (req, res, next) => {
   }
 
   if (!browserWSEndpoint) {
-    const browser = await puppeteer.launch()
+    const browser = await chromium.puppeteer.launch()
     browserWSEndpoint = await browser.wsEndpoint()
   }
 
