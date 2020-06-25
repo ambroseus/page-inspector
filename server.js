@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const puppeteer = require('puppeteer')
 const { ssr } = require('./ssr.js')
 
@@ -14,6 +15,8 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
   next()
 })
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 let browserWSEndpoint = null
 
@@ -33,4 +36,10 @@ app.get('/', async (req, res, next) => {
 
   const { html, status } = await ssr(url, browserWSEndpoint)
   return res.status(status).send(html)
+})
+
+app.post('/', (req, res) => {
+  console.log(req.body)
+
+  return res.status(200).send('')
 })

@@ -82,7 +82,7 @@ async function ssr(url, browserWSEndpoint) {
     }, url)
 
     // inject global <script> for event listeners
-    await page.evaluate(async () => {
+    await page.evaluate(async url => {
       function onMouseMove(e) {
         if (!highlightEnabled) return
 
@@ -139,6 +139,16 @@ async function ssr(url, browserWSEndpoint) {
             const target = currentEl.innerHTML.toString()
             const element = currentEl.outerHTML.toString()
             const xpath = getXPath(currentEl)
+
+            fetch('http://localhost:8081/', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ url: inspectUrl, target, element, xpath }),
+            })
+
             alert(`target: ${target}\n\nelement: ${element}\n\nxpath: ${xpath}`)
 
             currentEl = undefined
@@ -149,6 +159,7 @@ async function ssr(url, browserWSEndpoint) {
 
       const script = document.createElement('script')
       script.innerHTML = `
+        var inspectUrl = '${url}'
         var currentEl
         var currentElStyle
         var currentElOnClick
@@ -156,7 +167,7 @@ async function ssr(url, browserWSEndpoint) {
         document.onmousemove = ${onMouseMove.toString()}
         `
       document.head.append(script)
-    })
+    }, url)
 
     // inject  button and handler
     await page.evaluate(async url => {
