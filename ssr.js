@@ -1,4 +1,4 @@
-const { puppeteer } = require('chrome-aws-lambda')
+const puppeteer = require('puppeteer')
 
 // https://hackernoon.com/tips-and-tricks-for-web-scraping-with-puppeteer-ed391a63d952
 // Don't download all resources, we just need the HTML

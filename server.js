@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const { puppeteer } = require('chrome-aws-lambda')
+const puppeteer = require('puppeteer')
 const { ssr } = require('./ssr.js')
 
 const hostname = '127.0.0.1'
