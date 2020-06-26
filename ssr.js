@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer-core')
 
 // https://hackernoon.com/tips-and-tricks-for-web-scraping-with-puppeteer-ed391a63d952
 // Don't download all resources, we just need the HTML
