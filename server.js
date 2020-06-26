@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const chromium = require('chrome-aws-lambda')
+const { puppeteer } = require('chrome-aws-lambda')
 const { ssr } = require('./ssr.js')
 
 const hostname = '127.0.0.1'
@@ -26,11 +26,11 @@ app.get('/', async (req, res, next) => {
   if (!url) {
     return res
       .status(400)
-      .send(`Invalid url param: Example: ${host}/google.com`)
+      .send(`Invalid url param. Example: ${host}/?url=https://example.com`)
   }
 
   if (!browserWSEndpoint) {
-    const browser = await chromium.puppeteer.launch()
+    const browser = await puppeteer.launch()
     browserWSEndpoint = await browser.wsEndpoint()
   }
 
@@ -41,5 +41,5 @@ app.get('/', async (req, res, next) => {
 app.post('/', (req, res) => {
   console.log(req.body)
 
-  return res.status(200).send('')
+  return res.status(200).send('OK')
 })

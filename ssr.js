@@ -1,4 +1,4 @@
-const chromium = require('chrome-aws-lambda')
+const { puppeteer } = require('chrome-aws-lambda')
 
 // https://hackernoon.com/tips-and-tricks-for-web-scraping-with-puppeteer-ed391a63d952
 // Don't download all resources, we just need the HTML
@@ -44,7 +44,7 @@ const skippedResources = [
  *     a new browser instance is launched
  */
 async function ssr(url, browserWSEndpoint) {
-  const browser = await chromium.puppeteer.connect({ browserWSEndpoint })
+  const browser = await puppeteer.connect({ browserWSEndpoint })
 
   try {
     const page = await browser.newPage()
