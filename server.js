@@ -9,7 +9,6 @@ const host = `http://localhost:${port}`
 
 const app = express()
 
-app.configure(() => app.set('port', port))
 app.listen(port, () => console.log(`page-inspector listen on ${host}`))
 
 app.use((req, res, next) => {
