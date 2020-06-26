@@ -30,7 +30,11 @@ app.get('/', async (req, res, next) => {
   }
 
   if (!browserWSEndpoint) {
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch({
+      executablePath: '/usr/bin/google-chrome-stable',
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    })
     browserWSEndpoint = await browser.wsEndpoint()
   }
 
