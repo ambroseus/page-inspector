@@ -140,6 +140,7 @@ async function ssr(url, browserWSEndpoint) {
             const element = currentEl.outerHTML.toString()
             const xpath = getXPath(currentEl)
 
+            /*
             fetch('http://localhost:8081/', {
               method: 'POST',
               headers: {
@@ -154,7 +155,7 @@ async function ssr(url, browserWSEndpoint) {
                 xpath,
               }),
             })
-
+            */
             alert(`target: ${target}\n\nelement: ${element}\n\nxpath: ${xpath}`)
 
             currentEl = undefined
