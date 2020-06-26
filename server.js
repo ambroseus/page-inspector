@@ -4,11 +4,12 @@ const { puppeteer } = require('chrome-aws-lambda')
 const { ssr } = require('./ssr.js')
 
 const hostname = '127.0.0.1'
-const port = 3000
+const port = process.env.PORT || 3000
 const host = `http://localhost:${port}`
 
 const app = express()
 
+app.configure(() => app.set('port', port))
 app.listen(port, () => console.log(`page-inspector listen on ${host}`))
 
 app.use((req, res, next) => {
